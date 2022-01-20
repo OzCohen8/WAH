@@ -18,15 +18,18 @@ def create_layout():
     ]
 
     control_panel_column = [
-        [sg.Text("Control Panel")],
-        [sg.Text("global Functions:")],
+        [sg.Text("Control Panel", size=[10, 1]), sg.Button("Log-Out")],
+        [sg.Text("Work on:", size=[10, 1]), sg.InputText(size=(25, 1), enable_events=True, key="Name")],
+        [sg.Text("Destination:", size=[10, 1]), sg.InputText(size=(25, 1), enable_events=True, key="dast")],
+        [sg.Text("Target number:", size=[15, 1])],
+        [sg.Radio("single target", "RADIO", key="single")],
+        [sg.Radio("multiple targets", "RADIO", key="multiple")],
+        [sg.Text("Functions:", size=[10, 1])],
         [sg.Button("Mark all Unread as Read")],
-        [sg.Text("personal Functions:")],
         [sg.Button("Send Message"), sg.Button("Last Seen")],
-        [sg.Text("Work on:"), sg.InputText(size=(25, 1), enable_events=True, key="-Name-")],
     ]
     output_column = [
-        [sg.Text("OutPut:")],
+        [sg.Text("Output:")],
         [sg.Text(size=(40, 1), key="-OUTPUT-")],
         [sg.Listbox(values=[], enable_events=True, size=(30, 18), key="-OUTPUT LIST-")],
     ]
@@ -137,12 +140,15 @@ async def ui():
                 add_new_user(f_name=values["f_name_sign_up"], l_name=values["l_name_sign_up"], email=values["email_sign_up"], username=values["user_name_sign_up"],password=values["password_sign_up"])
                 WAH_WhatsApp_Automation_helper.window["sign_up_panel"].update(visible=False)
                 WAH_WhatsApp_Automation_helper.window["main_panel"].update(visible=True)
-                WAH_WhatsApp_Automation_helper.wah.start()
+                # WAH_WhatsApp_Automation_helper.wah.start()
         elif event == "Connect":
             if check_user_exists(values["username_log_in"], values["password_log_in"]):
                 WAH_WhatsApp_Automation_helper.window["login_panel"].update(visible=False)
                 WAH_WhatsApp_Automation_helper.window["main_panel"].update(visible=True)
-                WAH_WhatsApp_Automation_helper.wah.start()
+                # WAH_WhatsApp_Automation_helper.wah.start()
             else:
                 WAH_WhatsApp_Automation_helper.window["login_status"].update("Wrong User Name or Password")
+        elif event == "Log-Out":
+            WAH_WhatsApp_Automation_helper.window["login_panel"].update(visible=True)
+            WAH_WhatsApp_Automation_helper.window["main_panel"].update(visible=False)
         await asyncio.sleep(0)
