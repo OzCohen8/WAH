@@ -38,11 +38,12 @@ def create_layout():
     layout_sign_up = [
         [sg.Text('Sign Up Now!')],
         [sg.Text('Please enter your Name, Email, Username and password')],
-        [sg.Text('First Name:', size=(10, 1)), sg.InputText(enable_events=True, key='f_name_sign_up')],
-        [sg.Text('Last Name:', size=(10, 1)), sg.InputText(enable_events=True, key='l_name_sign_up')],
-        [sg.Text('Email:', size=(10, 1)), sg.InputText(enable_events=True, key='email_sign_up')],
-        [sg.Text('User Name:', size=(10, 1)), sg.InputText(enable_events=True, key='user_name_sign_up')],
-        [sg.Text('Password:', size=(10, 1)), sg.InputText(enable_events=True, key='password_sign_up')],
+        [sg.Text('First Name:', size=(13, 1)), sg.InputText(enable_events=True, key='f_name_sign_up')],
+        [sg.Text('Last Name:', size=(13, 1)), sg.InputText(enable_events=True, key='l_name_sign_up')],
+        [sg.Text('Email:', size=(13, 1)), sg.InputText(enable_events=True, key='email_sign_up')],
+        [sg.Text('User Name:', size=(13, 1)), sg.InputText(enable_events=True, key='user_name_sign_up')],
+        [sg.Text('Password:', size=(13, 1)), sg.InputText(enable_events=True, key='password_sign_up', password_char='*')],
+        [sg.Text('Repeat Password:', size=(13, 1)), sg.InputText(enable_events=True, key='re_password_sign_up', password_char='*')],
         [sg.Button("Sign Up"), sg.Cancel("Cancel")]
     ]
 
@@ -86,11 +87,20 @@ def validate_sign_up(values):
     elif len(values["user_name_sign_up"]) < 4:
         values_invalid.append("User Name should be at least 5 chars")
         is_valid = False
+    elif check_field_exists("UserName", values["user_name_sign_up"]):
+        values_invalid.append("User Name already exists")
+        is_valid = False
     if len(values["password_sign_up"]) == 0:
         values_invalid.append("Password is required")
         is_valid = False
     elif len(values["password_sign_up"]) < 5:
         values_invalid.append("Password should be at least 6 chars")
+        is_valid = False
+    if values["password_sign_up"] != values["re_password_sign_up"]:
+        values_invalid.append("Passwords don't match")
+        is_valid = False
+    elif check_field_exists("Password", values["password_sign_up"]):
+        values_invalid.append("Password already exists")
         is_valid = False
     return is_valid, values_invalid
 

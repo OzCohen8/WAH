@@ -22,10 +22,16 @@ def add_new_user(f_name, l_name, email, username, password):
 def check_user_exists(username, password):
     result = collection.find_one({"UserName": username, "Password": password})
     if result:
-        print("Log-in succesfuly")
-        print(result)
+        print("Log-in successfully")
         return result
     print("Error Password or Username")
+    return False
+
+
+def check_field_exists(field, data):
+    result = collection.find_one({field: data})
+    if result:
+        return True
     return False
 
 
