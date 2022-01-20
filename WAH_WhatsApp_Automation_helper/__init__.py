@@ -11,13 +11,17 @@ wah = WhatsApp()
 window = sg.Window(title="WAA - WhatsApp Automation and Helper", layout=create_layout(), margins=(20, 20),)
 
 
-async def wait_list():
-    await asyncio.wait([asyncio.create_task(background()), asyncio.create_task(ui())])
+async def wait_list(*args):
+    tasks = [asyncio.create_task(arg) for arg in args]
+    tasks.insert(0, asyncio.create_task(background()))
+    tasks.insert(1, asyncio.create_task(ui()))
+    await asyncio.wait(tasks)
 
+WaitList = wait_list()
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(wait_list())
+    loop.run_until_complete(WaitList)
     loop.close()
 
 

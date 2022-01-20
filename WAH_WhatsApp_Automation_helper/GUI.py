@@ -6,13 +6,14 @@ import WAH_WhatsApp_Automation_helper
 from WAH_WhatsApp_Automation_helper.MongoDb_Service import *
 from WAH_WhatsApp_Automation_helper.whats_app_functions import WhatsApp
 
+
 def create_layout():
     layout_login = [
         [sg.Text("Log - In")],
         [sg.Text("User Name:", size=(9, 1)), sg.InputText(key="username_log_in")],
         [sg.Text("Password:", size=(9, 1)), sg.InputText(password_char='*', key="password_log_in")],
         [sg.Text("", key="rand", size=(20, 1))],
-        [sg.Text("", key="login_status", size=(20, 1))],
+        [sg.Text("", key="login_status", size=(25, 1))],
         [sg.Button("Connect"), sg.Button("Sign Up Now"), sg.Button("Quit")],
     ]
 
