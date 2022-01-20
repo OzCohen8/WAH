@@ -3,9 +3,11 @@ import PySimpleGUI as sg
 from WAH_WhatsApp_Automation_helper.GUI import ui, create_layout
 from WAH_WhatsApp_Automation_helper.Background import background
 from WAH_WhatsApp_Automation_helper.MongoDb_Service import *
+from  WAH_WhatsApp_Automation_helper.whats_app_functions import *
 
 sg.change_look_and_feel("DarkTeal1")
 STATE = "init"
+wah = WhatsApp()
 window = sg.Window(title="WAA - WhatsApp Automation and Helper", layout=create_layout(), margins=(20, 20),)
 
 

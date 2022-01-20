@@ -31,6 +31,9 @@ class WhatsApp:
     browser = None
 
     def __init__(self):
+        self.browser = ""
+
+    def start(self):
         """
         get the browser of whatsapp web running
         waits until the client opens his whatsapp web (scanning QR)

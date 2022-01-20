@@ -4,12 +4,14 @@ import PySimpleGUI as sg
 import asyncio
 import WAH_WhatsApp_Automation_helper
 from WAH_WhatsApp_Automation_helper.MongoDb_Service import *
-
+from WAH_WhatsApp_Automation_helper.whats_app_functions import WhatsApp
 
 def create_layout():
     layout_login = [
-        [sg.Text("")],
-        [sg.Text("Password: "), sg.InputText(password_char='*', key="password")],
+        [sg.Text("Log - In")],
+        [sg.Text("User Name:", size=(9, 1)), sg.InputText(key="username_log_in")],
+        [sg.Text("Password:", size=(9, 1)), sg.InputText(password_char='*', key="password_log_in")],
+        [sg.Text("", key="rand", size=(20, 1))],
         [sg.Text("", key="login_status", size=(20, 1))],
         [sg.Button("Connect"), sg.Button("Sign Up Now"), sg.Button("Quit")],
     ]
@@ -116,7 +118,10 @@ async def ui():
     while True:
         event, values = WAH_WhatsApp_Automation_helper.window.read(timeout=1)
         WAH_WhatsApp_Automation_helper.STATE = "ready"
-        if event == "Quit" or event == sg.WIN_CLOSED:
+        if event == "Quit":
+            sys.exit()
+        if event == sg.WIN_CLOSED:
+            WAH_WhatsApp_Automation_helper.wah.quit()
             sys.exit()
         elif event == "Sign Up Now":
             WAH_WhatsApp_Automation_helper.window["login_panel"].update(visible=False)
@@ -132,7 +137,12 @@ async def ui():
                 add_new_user(f_name=values["f_name_sign_up"], l_name=values["l_name_sign_up"], email=values["email_sign_up"], username=values["user_name_sign_up"],password=values["password_sign_up"])
                 WAH_WhatsApp_Automation_helper.window["sign_up_panel"].update(visible=False)
                 WAH_WhatsApp_Automation_helper.window["main_panel"].update(visible=True)
+                WAH_WhatsApp_Automation_helper.wah.start()
         elif event == "Connect":
-            WAH_WhatsApp_Automation_helper.window["login_panel"].update(visible=False)
-            WAH_WhatsApp_Automation_helper.window["main_panel"].update(visible=True)
+            if check_user_exists(values["username_log_in"], values["password_log_in"]):
+                WAH_WhatsApp_Automation_helper.window["login_panel"].update(visible=False)
+                WAH_WhatsApp_Automation_helper.window["main_panel"].update(visible=True)
+                WAH_WhatsApp_Automation_helper.wah.start()
+            else:
+                WAH_WhatsApp_Automation_helper.window["login_status"].update("Wrong User Name or Password")
         await asyncio.sleep(0)
