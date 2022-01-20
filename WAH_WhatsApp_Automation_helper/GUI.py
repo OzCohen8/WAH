@@ -119,10 +119,9 @@ async def ui():
     while True:
         event, values = WAH_WhatsApp_Automation_helper.window.read(timeout=1)
         WAH_WhatsApp_Automation_helper.STATE = "ready"
-        if event == "Quit":
-            sys.exit()
-        if event == sg.WIN_CLOSED:
-            WAH_WhatsApp_Automation_helper.wah.quit()
+        if event == "Quit" or event == sg.WIN_CLOSED:
+            if WAH_WhatsApp_Automation_helper.window["main_panel"].visible:
+                WAH_WhatsApp_Automation_helper.wah.quit()
             sys.exit()
         elif event == "Sign Up Now":
             WAH_WhatsApp_Automation_helper.window["login_panel"].update(visible=False)
