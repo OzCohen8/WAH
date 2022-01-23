@@ -24,6 +24,8 @@ def create_layout():
         [sg.Text("Target number:", size=[15, 1])],
         [sg.Radio("single target", "RADIO", key="single")],
         [sg.Radio("multiple targets", "RADIO", key="multiple")],
+        [sg.Input(key="StartTime", size=(10, 1)),
+         sg.CalendarButton("Start action at", close_when_date_chosen=True, target="StartTime",  location=(0,0), no_titlebar=False)],
         [sg.Text("Functions:", size=[10, 1])],
         [sg.Button("Mark all Unread as Read")],
         [sg.Button("Send Message"), sg.Button("Last Seen")],
@@ -111,6 +113,18 @@ def validate_sign_up(values):
     return is_valid, values_invalid
 
 
+def validate_last_seen(values):
+    is_valid = True
+    values_invalid = []
+    if len(values["Name"]) == 0:
+        values_invalid.append("Work on is required")
+        is_valid = False
+    if values["dast"] == 0:
+        values_invalid.append("Destination is required")
+        is_valid = False
+    return is_valid, values_invalid
+
+
 def generate_error_message(values_invalid):
     error_message = ""
     for value in values_invalid:
@@ -140,7 +154,7 @@ async def ui():
                 add_new_user(f_name=values["f_name_sign_up"], l_name=values["l_name_sign_up"], email=values["email_sign_up"], username=values["user_name_sign_up"],password=values["password_sign_up"])
                 WAH_WhatsApp_Automation_helper.window["sign_up_panel"].update(visible=False)
                 WAH_WhatsApp_Automation_helper.window["main_panel"].update(visible=True)
-                # WAH_WhatsApp_Automation_helper.wah.start()
+                WAH_WhatsApp_Automation_helper.wah.start()
         elif event == "Connect":
             if check_user_exists(values["username_log_in"], values["password_log_in"]):
                 WAH_WhatsApp_Automation_helper.window["login_panel"].update(visible=False)
@@ -151,4 +165,10 @@ async def ui():
         elif event == "Log-Out":
             WAH_WhatsApp_Automation_helper.window["login_panel"].update(visible=True)
             WAH_WhatsApp_Automation_helper.window["main_panel"].update(visible=False)
+        elif event == "Last Seen":
+            is_valid, values_invalid = validate_last_seen(values)
+            if not is_valid:
+                sg.popup(generate_error_message(values_invalid))
+            else:
+                WAH_WhatsApp_Automation_helper.wah.last_seen(values["Name"], values["dast"])
         await asyncio.sleep(0)
