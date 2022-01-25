@@ -1,3 +1,5 @@
+import asyncio
+
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -95,7 +97,7 @@ class WhatsApp:
         # Block until the action has been run
         s.run()
 
-    def last_seen(self, name, dast_chat):
+    async def last_seen(self, name, dast_chat):
         """
         a function which checks repeatedly if a person is online, saves the time he was online
         and send a message in a disire chat to the client
@@ -108,18 +110,20 @@ class WhatsApp:
         self.find_chat_person(name)
         time.sleep(5)
         while True:
-            if keyboard.is_pressed("q"):  # End the function when q entered
-                print("\nEnd of function")
-                break
+            # if keyboard.is_pressed("q"):  # End the function when q entered
+            #     print("\nEnd of function")
+            #     break
             try:
                 self.browser.find_element(By.XPATH, WhatsAppElements.online_span)
                 if online_status:
+                    await asyncio.sleep(0)
                     continue
                 online_status = True
                 connected_on = datetime.datetime.now()
                 online_string = f"{name} is online {connected_on.strftime('%c')}"
             except:
                 if not online_status:
+                    await asyncio.sleep(0)
                     continue
                 connected_finish = datetime.datetime.now()
                 online_string = f"{name} is not online,\n connected for {connected_finish - connected_on}"
@@ -127,6 +131,34 @@ class WhatsApp:
             print(online_string)
             self.send_message(dast_chat, online_string)
             self.find_chat_person(name)
+            await asyncio.sleep(0)
+
+    def last_seen_move(self, name):
+        self.find_chat_person(name)
+        time.sleep(5)
+
+    def last_seen_run(self, name, dast_chat, online_status=False, connected_on=None):
+        online_string = ""
+        changed = False
+        try:
+            self.browser.find_element(By.XPATH, WhatsAppElements.online_span)
+            if not online_status:
+                online_status = True
+                changed = True
+                connected_on = datetime.datetime.now()
+                online_string = f"{name} is online {connected_on.strftime('%c')}"
+        except:
+            if online_status:
+                connected_finish = datetime.datetime.now()
+                online_string = f"{name} is not online,\n connected for {connected_finish - connected_on}"
+                online_status = False
+                changed = True
+        if changed:
+            print(online_string)
+            self.send_message(dast_chat, online_string)
+            self.find_chat_person(name)
+        return online_string, connected_on, online_status
+
 
     def quit(self):
         """

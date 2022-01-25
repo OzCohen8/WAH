@@ -34,6 +34,7 @@ def create_layout():
         [sg.Text("Output:")],
         [sg.Text(size=(40, 1), key="-OUTPUT-")],
         [sg.Listbox(values=[], enable_events=True, size=(30, 18), key="-OUTPUT LIST-")],
+        [sg.Button("End Action")],
     ]
     layout_main = [
         [
@@ -133,6 +134,9 @@ def generate_error_message(values_invalid):
 
 
 async def ui():
+    output_string = ""
+    lastSeen = False
+    connected_on, online_status, name_last , dast_last = None, False, "", ""
     while True:
         event, values = WAH_WhatsApp_Automation_helper.window.read(timeout=1)
         WAH_WhatsApp_Automation_helper.STATE = "ready"
@@ -159,16 +163,28 @@ async def ui():
             if check_user_exists(values["username_log_in"], values["password_log_in"]):
                 WAH_WhatsApp_Automation_helper.window["login_panel"].update(visible=False)
                 WAH_WhatsApp_Automation_helper.window["main_panel"].update(visible=True)
-                # WAH_WhatsApp_Automation_helper.wah.start()
+                WAH_WhatsApp_Automation_helper.wah.start()
             else:
                 WAH_WhatsApp_Automation_helper.window["login_status"].update("Wrong User Name or Password")
-        elif event == "Log-Out":
-            WAH_WhatsApp_Automation_helper.window["login_panel"].update(visible=True)
-            WAH_WhatsApp_Automation_helper.window["main_panel"].update(visible=False)
         elif event == "Last Seen":
             is_valid, values_invalid = validate_last_seen(values)
             if not is_valid:
                 sg.popup(generate_error_message(values_invalid))
             else:
-                WAH_WhatsApp_Automation_helper.wah.last_seen(values["Name"], values["dast"])
+                 lastSeen = True
+                 name_last, dast_last = values["Name"], values["dast"]
+                 output_string += f"online check for {name_last}\nStarting..."
+                 WAH_WhatsApp_Automation_helper.wah.last_seen_move(values["Name"])
+        elif event == "End Action":
+            lastSeen = False
+            output_string += "Action Stopped.\n"
+        elif event == "Log-Out":
+            WAH_WhatsApp_Automation_helper.window["login_panel"].update(visible=True)
+            WAH_WhatsApp_Automation_helper.window["main_panel"].update(visible=False)
+        if lastSeen:
+            online_string, connected_on, online_status = WAH_WhatsApp_Automation_helper.wah.last_seen_run(name_last, dast_last, online_status,connected_on)
+            if online_string:
+                output_string += online_string
+        print(output_string)
+        WAH_WhatsApp_Automation_helper.window["-OUTPUT LIST-"].update(output_string)
         await asyncio.sleep(0)
