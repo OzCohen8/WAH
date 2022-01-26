@@ -134,9 +134,9 @@ def generate_error_message(values_invalid):
 
 
 async def ui():
-    output_string = ""
+    output_string = []
     lastSeen = False
-    connected_on, online_status, name_last , dast_last = None, False, "", ""
+    connected_on, online_status, name_last, dast_last = None, False, "", ""
     while True:
         event, values = WAH_WhatsApp_Automation_helper.window.read(timeout=1)
         WAH_WhatsApp_Automation_helper.STATE = "ready"
@@ -173,18 +173,19 @@ async def ui():
             else:
                  lastSeen = True
                  name_last, dast_last = values["Name"], values["dast"]
-                 output_string += f"online check for {name_last}\nStarting..."
+                 output_string.append(f"online check for {name_last})")
+                 output_string.append("Starting...")
+                 WAH_WhatsApp_Automation_helper.window["-OUTPUT LIST-"].update(output_string)
                  WAH_WhatsApp_Automation_helper.wah.last_seen_move(values["Name"])
         elif event == "End Action":
             lastSeen = False
-            output_string += "Action Stopped.\n"
+            output_string.append("Action Stopped.")
         elif event == "Log-Out":
             WAH_WhatsApp_Automation_helper.window["login_panel"].update(visible=True)
             WAH_WhatsApp_Automation_helper.window["main_panel"].update(visible=False)
         if lastSeen:
             online_string, connected_on, online_status = WAH_WhatsApp_Automation_helper.wah.last_seen_run(name_last, dast_last, online_status,connected_on)
             if online_string:
-                output_string += online_string
-        print(output_string)
-        WAH_WhatsApp_Automation_helper.window["-OUTPUT LIST-"].update(output_string)
+                output_string.append(online_string)
+                WAH_WhatsApp_Automation_helper.window["-OUTPUT LIST-"].update(output_string)
         await asyncio.sleep(0)
