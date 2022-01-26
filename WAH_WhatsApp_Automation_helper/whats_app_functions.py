@@ -155,8 +155,9 @@ class WhatsApp:
                 changed = True
         if changed:
             print(online_string)
-            self.send_message(dast_chat, online_string)
-            self.find_chat_person(name)
+            if dast_chat:
+                self.send_message(dast_chat, online_string)
+                self.find_chat_person(name)
         return online_string, connected_on, online_status
 
 

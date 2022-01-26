@@ -121,8 +121,7 @@ def validate_last_seen(values):
         values_invalid.append("Work on is required")
         is_valid = False
     if values["dast"] == 0:
-        values_invalid.append("Destination is required")
-        is_valid = False
+        values_invalid.append("Destination is required if you want to send updates to your phone")
     return is_valid, values_invalid
 
 
@@ -173,7 +172,7 @@ async def ui():
             else:
                  lastSeen = True
                  name_last, dast_last = values["Name"], values["dast"]
-                 output_string.append(f"online check for {name_last})")
+                 output_string.append(f"online check for {name_last} :")
                  output_string.append("Starting...")
                  WAH_WhatsApp_Automation_helper.window["-OUTPUT LIST-"].update(output_string)
                  WAH_WhatsApp_Automation_helper.wah.last_seen_move(values["Name"])
