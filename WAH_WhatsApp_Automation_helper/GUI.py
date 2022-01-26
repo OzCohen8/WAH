@@ -18,24 +18,24 @@ def create_layout():
     ]
 
     control_panel_column = [
-        [sg.Text("Control Panel", size=[10, 1]), sg.Button("Log-Out")],
-        [sg.Text("Work on:", size=[10, 1]), sg.InputText(size=(25, 1), enable_events=True, key="Name")],
-        [sg.Text("Destination:", size=[10, 1]), sg.InputText(size=(25, 1), enable_events=True, key="dast")],
-        [sg.Text("Message Content:", size=[10, 1]), sg.InputText(size=(25, 1), enable_events=True, key="msg_content")],
+        [sg.Text("Control Panel", size=[13, 1]), sg.Button("Log-Out")],
+        [sg.Text("Work on:", size=[13, 1]), sg.InputText(size=(25, 1), enable_events=True, key="Name")],
+        [sg.Text("Destination:", size=[13, 1]), sg.InputText(size=(25, 1), enable_events=True, key="dast")],
+        [sg.Text("Message Content:", size=[13, 1]), sg.InputText(size=(25, 1), enable_events=True, key="msg_content")],
         [sg.Text("Target number:", size=[15, 1])],
         [sg.Radio("single target", "RADIO", key="single")],
         [sg.Radio("multiple targets", "RADIO", key="multiple")],
-        [sg.Input(key="StartTime", size=(10, 1)),
+        [sg.Input(key="StartTime", size=(13, 1)),
          sg.CalendarButton("Start action at", close_when_date_chosen=True, target="StartTime", location=(0, 0),
                            no_titlebar=False)],
         [sg.Text("Functions:", size=[10, 1])],
-        [sg.Button("Mark all Unread as Read")],
+        [sg.Button("Mark Unread as Read")],
         [sg.Button("Send Message"), sg.Button("Last Seen")],
     ]
     output_column = [
         [sg.Text("Output:")],
         [sg.Text(size=(40, 1), key="-OUTPUT-")],
-        [sg.Listbox(values=[], enable_events=True, size=(30, 18), key="-OUTPUT LIST-")],
+        [sg.Listbox(values=[], enable_events=False, size=(40, 20), key="-OUTPUT LIST-")],
         [sg.Button("End Action")],
     ]
     layout_main = [
@@ -208,6 +208,7 @@ async def ui():
         elif event == "End Action":
             lastSeen = False
             output_string.append("Action Stopped.")
+            WAH_WhatsApp_Automation_helper.window["-OUTPUT LIST-"].update(output_string)
         elif event == "Send Message":
             is_valid, values_invalid = validate_send_msg(values)
             if not is_valid:
@@ -220,6 +221,12 @@ async def ui():
         elif event == "Log-Out":
             WAH_WhatsApp_Automation_helper.window["login_panel"].update(visible=True)
             WAH_WhatsApp_Automation_helper.window["main_panel"].update(visible=False)
+        elif event == "Mark Unread as Read":
+            output_string.append(f"reading all unread chats..")
+            WAH_WhatsApp_Automation_helper.window["-OUTPUT LIST-"].update(output_string)
+            WAH_WhatsApp_Automation_helper.wah.read_all_unread_messages()
+            output_string.append(f"all Chats been read")
+            WAH_WhatsApp_Automation_helper.window["-OUTPUT LIST-"].update(output_string)
         if lastSeen:
             online_string, connected_on, online_status = WAH_WhatsApp_Automation_helper.wah.last_seen_run(name_last,
                                                                                                           dast_last,

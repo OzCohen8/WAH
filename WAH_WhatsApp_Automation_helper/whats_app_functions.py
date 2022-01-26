@@ -190,7 +190,7 @@ class WhatsApp:
         a function which reads all unread chats
         """
         print("reading all unread chats..")
-        usernames = self.unread_usernames(200)
+        usernames = self.unread_usernames(400)
         for username in usernames:
             self.find_chat_person(username)
         print("all Chats been read")
