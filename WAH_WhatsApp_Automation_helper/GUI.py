@@ -205,9 +205,13 @@ async def ui():
                 WAH_WhatsApp_Automation_helper.window["-OUTPUT LIST-"].update(output_string)
                 WAH_WhatsApp_Automation_helper.wah.last_seen_move(values["Name"])
         elif event == "End Action":
-            lastSeen = False
-            output_string.append("Action Stopped.")
-            WAH_WhatsApp_Automation_helper.window["-OUTPUT LIST-"].update(output_string)
+            if lastSeen:
+                output_string.append("Action Stopped.")
+                WAH_WhatsApp_Automation_helper.window["-OUTPUT LIST-"].update(output_string)
+                lastSeen = False
+            else:
+                output_string.append("No action detected")
+                WAH_WhatsApp_Automation_helper.window["-OUTPUT LIST-"].update(output_string)
         elif event == "Send Message":
             is_valid, values_invalid = validate_send_msg(values)
             if not is_valid:
