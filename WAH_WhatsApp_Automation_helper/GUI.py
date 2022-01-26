@@ -35,7 +35,7 @@ def create_layout():
         [sg.Text("Output:")],
         [sg.Text(size=(40, 1), key="-OUTPUT-")],
         [sg.Listbox(values=[], enable_events=False, size=(40, 20), key="-OUTPUT LIST-")],
-        [sg.Button("End Action")],
+        [sg.Button("End Action"), sg.Button("Clear")],
     ]
     layout_main = [
         [
@@ -159,8 +159,8 @@ def get_targets(targets_string):
 
 
 async def ui():
-    output_string = []
-    lastSeen = False
+    output = []
+    last_seen = False
     connected_on, online_status, name_last, dast_last = None, False, "", ""
     while True:
         event, values = WAH_WhatsApp_Automation_helper.window.read(timeout=1)
@@ -198,44 +198,47 @@ async def ui():
             if not is_valid:
                 sg.popup(generate_error_message(values_invalid))
             else:
-                lastSeen = True
+                last_seen = True
                 name_last, dast_last = values["Name"], values["dast"]
-                output_string.append(f"online check for {name_last} :")
-                output_string.append("Starting...")
-                WAH_WhatsApp_Automation_helper.window["-OUTPUT LIST-"].update(output_string)
+                output.append(f"online check for {name_last} :")
+                output.append("Starting...")
+                WAH_WhatsApp_Automation_helper.window["-OUTPUT LIST-"].update(output)
                 WAH_WhatsApp_Automation_helper.wah.last_seen_move(values["Name"])
         elif event == "End Action":
-            if lastSeen:
-                output_string.append("Action Stopped.")
-                WAH_WhatsApp_Automation_helper.window["-OUTPUT LIST-"].update(output_string)
-                lastSeen = False
+            if last_seen:
+                output.append("Action Stopped.")
+                WAH_WhatsApp_Automation_helper.window["-OUTPUT LIST-"].update(output)
+                last_seen = False
             else:
-                output_string.append("No action detected")
-                WAH_WhatsApp_Automation_helper.window["-OUTPUT LIST-"].update(output_string)
+                output.append("No action detected")
+                WAH_WhatsApp_Automation_helper.window["-OUTPUT LIST-"].update(output)
         elif event == "Send Message":
             is_valid, values_invalid = validate_send_msg(values)
             if not is_valid:
                 sg.popup(generate_error_message(values_invalid))
             else:
                 for target in get_targets(values["dast"]):
-                    output_string.append(f"Sending {values['msg_content']} to {target}")
-                    WAH_WhatsApp_Automation_helper.window["-OUTPUT LIST-"].update(output_string)
+                    output.append(f"Sending {values['msg_content']} to {target}")
+                    WAH_WhatsApp_Automation_helper.window["-OUTPUT LIST-"].update(output)
                     WAH_WhatsApp_Automation_helper.wah.send_message(send_to=target, message=values["msg_content"])
         elif event == "Log-Out":
             WAH_WhatsApp_Automation_helper.window["login_panel"].update(visible=True)
             WAH_WhatsApp_Automation_helper.window["main_panel"].update(visible=False)
         elif event == "Mark Unread as Read":
-            output_string.append(f"reading all unread chats..")
-            WAH_WhatsApp_Automation_helper.window["-OUTPUT LIST-"].update(output_string)
+            output.append(f"reading all unread chats..")
+            WAH_WhatsApp_Automation_helper.window["-OUTPUT LIST-"].update(output)
             WAH_WhatsApp_Automation_helper.wah.read_all_unread_messages()
-            output_string.append(f"all Chats been read")
-            WAH_WhatsApp_Automation_helper.window["-OUTPUT LIST-"].update(output_string)
-        if lastSeen:
+            output.append(f"all Chats been read")
+            WAH_WhatsApp_Automation_helper.window["-OUTPUT LIST-"].update(output)
+        elif event == "Clear":
+            output.clear()
+            WAH_WhatsApp_Automation_helper.window["-OUTPUT LIST-"].update(output)
+        if last_seen:
             online_string, connected_on, online_status = WAH_WhatsApp_Automation_helper.wah.last_seen_run(name_last,
                                                                                                           dast_last,
                                                                                                           online_status,
                                                                                                           connected_on)
             if online_string:
-                output_string.append(online_string)
-                WAH_WhatsApp_Automation_helper.window["-OUTPUT LIST-"].update(output_string)
+                output.append(online_string)
+                WAH_WhatsApp_Automation_helper.window["-OUTPUT LIST-"].update(output)
         await asyncio.sleep(0)
