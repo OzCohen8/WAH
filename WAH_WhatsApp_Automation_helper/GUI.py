@@ -21,11 +21,13 @@ def create_layout():
         [sg.Text("Control Panel", size=[10, 1]), sg.Button("Log-Out")],
         [sg.Text("Work on:", size=[10, 1]), sg.InputText(size=(25, 1), enable_events=True, key="Name")],
         [sg.Text("Destination:", size=[10, 1]), sg.InputText(size=(25, 1), enable_events=True, key="dast")],
+        [sg.Text("Message Content:", size=[10, 1]), sg.InputText(size=(25, 1), enable_events=True, key="msg_content")],
         [sg.Text("Target number:", size=[15, 1])],
         [sg.Radio("single target", "RADIO", key="single")],
         [sg.Radio("multiple targets", "RADIO", key="multiple")],
         [sg.Input(key="StartTime", size=(10, 1)),
-         sg.CalendarButton("Start action at", close_when_date_chosen=True, target="StartTime",  location=(0,0), no_titlebar=False)],
+         sg.CalendarButton("Start action at", close_when_date_chosen=True, target="StartTime", location=(0, 0),
+                           no_titlebar=False)],
         [sg.Text("Functions:", size=[10, 1])],
         [sg.Button("Mark all Unread as Read")],
         [sg.Button("Send Message"), sg.Button("Last Seen")],
@@ -51,8 +53,10 @@ def create_layout():
         [sg.Text('Last Name:', size=(13, 1)), sg.InputText(enable_events=True, key='l_name_sign_up')],
         [sg.Text('Email:', size=(13, 1)), sg.InputText(enable_events=True, key='email_sign_up')],
         [sg.Text('User Name:', size=(13, 1)), sg.InputText(enable_events=True, key='user_name_sign_up')],
-        [sg.Text('Password:', size=(13, 1)), sg.InputText(enable_events=True, key='password_sign_up', password_char='*')],
-        [sg.Text('Repeat Password:', size=(13, 1)), sg.InputText(enable_events=True, key='re_password_sign_up', password_char='*')],
+        [sg.Text('Password:', size=(13, 1)),
+         sg.InputText(enable_events=True, key='password_sign_up', password_char='*')],
+        [sg.Text('Repeat Password:', size=(13, 1)),
+         sg.InputText(enable_events=True, key='re_password_sign_up', password_char='*')],
         [sg.Button("Sign Up"), sg.Cancel("Cancel")]
     ]
 
@@ -125,11 +129,34 @@ def validate_last_seen(values):
     return is_valid, values_invalid
 
 
+def validate_send_msg(values):
+    is_valid = True
+    values_invalid = []
+    if len(values["dast"]) == 0:
+        values_invalid.append("Destination required")
+        is_valid = False
+    if len(values["msg_content"]) == 0:
+        values_invalid.append("Message Content required")
+        is_valid = False
+
+    # if not values["single"] and not values[""]:
+    #     values_invalid.append("Target number are required")
+    #     is_valid = False
+    return is_valid, values_invalid
+
+
 def generate_error_message(values_invalid):
     error_message = ""
     for value in values_invalid:
         error_message += value + "\n"
     return error_message
+
+
+def get_targets(targets_string):
+    targets = targets_string.split(",")
+    for i in range(len(targets)):
+        targets[i] = targets[i].strip()
+    return targets
 
 
 async def ui():
@@ -154,7 +181,9 @@ async def ui():
             if not is_valid:
                 sg.popup(generate_error_message(values_invalid))
             else:
-                add_new_user(f_name=values["f_name_sign_up"], l_name=values["l_name_sign_up"], email=values["email_sign_up"], username=values["user_name_sign_up"],password=values["password_sign_up"])
+                add_new_user(f_name=values["f_name_sign_up"], l_name=values["l_name_sign_up"],
+                             email=values["email_sign_up"], username=values["user_name_sign_up"],
+                             password=values["password_sign_up"])
                 WAH_WhatsApp_Automation_helper.window["sign_up_panel"].update(visible=False)
                 WAH_WhatsApp_Automation_helper.window["main_panel"].update(visible=True)
                 WAH_WhatsApp_Automation_helper.wah.start()
@@ -170,20 +199,32 @@ async def ui():
             if not is_valid:
                 sg.popup(generate_error_message(values_invalid))
             else:
-                 lastSeen = True
-                 name_last, dast_last = values["Name"], values["dast"]
-                 output_string.append(f"online check for {name_last} :")
-                 output_string.append("Starting...")
-                 WAH_WhatsApp_Automation_helper.window["-OUTPUT LIST-"].update(output_string)
-                 WAH_WhatsApp_Automation_helper.wah.last_seen_move(values["Name"])
+                lastSeen = True
+                name_last, dast_last = values["Name"], values["dast"]
+                output_string.append(f"online check for {name_last} :")
+                output_string.append("Starting...")
+                WAH_WhatsApp_Automation_helper.window["-OUTPUT LIST-"].update(output_string)
+                WAH_WhatsApp_Automation_helper.wah.last_seen_move(values["Name"])
         elif event == "End Action":
             lastSeen = False
             output_string.append("Action Stopped.")
+        elif event == "Send Message":
+            is_valid, values_invalid = validate_send_msg(values)
+            if not is_valid:
+                sg.popup(generate_error_message(values_invalid))
+            else:
+                for target in get_targets(values["dast"]):
+                    output_string.append(f"Sending {values['msg_content']} to {target}")
+                    WAH_WhatsApp_Automation_helper.window["-OUTPUT LIST-"].update(output_string)
+                    WAH_WhatsApp_Automation_helper.wah.send_message(send_to=target, message=values["msg_content"])
         elif event == "Log-Out":
             WAH_WhatsApp_Automation_helper.window["login_panel"].update(visible=True)
             WAH_WhatsApp_Automation_helper.window["main_panel"].update(visible=False)
         if lastSeen:
-            online_string, connected_on, online_status = WAH_WhatsApp_Automation_helper.wah.last_seen_run(name_last, dast_last, online_status,connected_on)
+            online_string, connected_on, online_status = WAH_WhatsApp_Automation_helper.wah.last_seen_run(name_last,
+                                                                                                          dast_last,
+                                                                                                          online_status,
+                                                                                                          connected_on)
             if online_string:
                 output_string.append(online_string)
                 WAH_WhatsApp_Automation_helper.window["-OUTPUT LIST-"].update(output_string)
