@@ -4,7 +4,6 @@ import PySimpleGUI as sg
 import asyncio
 import WAH_WhatsApp_Automation_helper
 from WAH_WhatsApp_Automation_helper.MongoDb_Service import *
-from WAH_WhatsApp_Automation_helper.whats_app_functions import WhatsApp
 
 
 def create_layout():
