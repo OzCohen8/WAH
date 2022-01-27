@@ -21,9 +21,9 @@ def create_layout():
         [sg.Text("Work on:", size=[13, 1]), sg.InputText(size=(25, 1), enable_events=True, key="Name")],
         [sg.Text("Destination:", size=[13, 1]), sg.InputText(size=(25, 1), enable_events=True, key="dast")],
         [sg.Text("Message Content:", size=[13, 1]), sg.InputText(size=(25, 1), enable_events=True, key="msg_content")],
-        [sg.Text("Target number:", size=[15, 1])],
-        [sg.Radio("single target", "RADIO", key="single")],
-        [sg.Radio("multiple targets", "RADIO", key="multiple")],
+        # [sg.Text("Target number:", size=[15, 1])],
+        # [sg.Radio("single target", "RADIO", key="single")],
+        # [sg.Radio("multiple targets", "RADIO", key="multiple")],
         [sg.Input(key="StartTime", size=(13, 1)),
          sg.CalendarButton("Start action at", close_when_date_chosen=True, target="StartTime", location=(0, 0),
                            no_titlebar=False)],
@@ -218,9 +218,16 @@ async def ui():
                 sg.popup(generate_error_message(values_invalid))
             else:
                 for target in get_targets(values["dast"]):
-                    output.append(f"Sending {values['msg_content']} to {target}")
-                    WAH_WhatsApp_Automation_helper.window["-OUTPUT LIST-"].update(output)
-                    WAH_WhatsApp_Automation_helper.wah.send_message(send_to=target, message=values["msg_content"])
+                    if values["StartTime"]:
+                        output.append(f"Will send {values['msg_content']} to {target} at {values['StartTime']}")
+                        WAH_WhatsApp_Automation_helper.window["-OUTPUT LIST-"].update(output)
+                        WAH_WhatsApp_Automation_helper.wah.send_message_on_time(send_to=target,
+                                                                                message=values["msg_content"],
+                                                                                send_on_time=values['StartTime'])
+                    else:
+                        output.append(f"Sending {values['msg_content']} to {target}")
+                        WAH_WhatsApp_Automation_helper.window["-OUTPUT LIST-"].update(output)
+                        WAH_WhatsApp_Automation_helper.wah.send_message(send_to=target, message=values["msg_content"])
         elif event == "Log-Out":
             WAH_WhatsApp_Automation_helper.window["login_panel"].update(visible=True)
             WAH_WhatsApp_Automation_helper.window["main_panel"].update(visible=False)

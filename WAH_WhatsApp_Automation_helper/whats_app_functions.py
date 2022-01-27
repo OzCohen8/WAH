@@ -93,7 +93,7 @@ class WhatsApp:
         # Set up scheduler
         s = sched.scheduler(time.time, time.sleep)
         # Schedule when you want the action to occur
-        s.enterabs(time.mktime(time.strptime(send_on_time, "%H:%M %d/%m/%Y")), 0, self.send_message,argument=(send_to, message))
+        s.enterabs(time.mktime(time.strptime(send_on_time, "%Y-%m-%d %H:%M:%S")), 0, self.send_message, argument=(send_to, message))
         # Block until the action has been run
         s.run()
 
