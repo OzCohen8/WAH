@@ -3,7 +3,7 @@ import PySimpleGUI as sg
 from WAH_WhatsApp_Automation_helper.GUI import ui, create_layout
 from WAH_WhatsApp_Automation_helper.Background import background
 from WAH_WhatsApp_Automation_helper.MongoDb_Service import *
-from  WAH_WhatsApp_Automation_helper.whats_app_functions import *
+from WAH_WhatsApp_Automation_helper.whats_app_functions import *
 
 sg.change_look_and_feel("DarkTeal1")
 STATE = "init"
@@ -13,13 +13,6 @@ window = sg.Window(title="WAA - WhatsApp Automation and Helper", layout=create_l
 
 async def wait_list():
     await asyncio.wait([asyncio.create_task(background()), asyncio.create_task(ui())])
-
-
-if __name__ == '__main__':
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(wait_list())
-    loop.close()
-
 
 
 
