@@ -135,7 +135,7 @@ class WhatsApp:
 
     def last_seen_move(self, name):
         self.find_chat_person(name)
-        time.sleep(5)
+        time.sleep(3.5)
 
     def last_seen_run(self, name, dast_chat, online_status=False, connected_on=None):
         online_string = ""
